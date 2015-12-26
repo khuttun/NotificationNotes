@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Notification Notes</string>
+    <string name="save_note_text">SAVE</string>
+    <string name="title_hint">Title</string>
+    <string name="text_hint">Note text</string>
+    <string name="no_notes">No notes added yet.</string>
+</resources>

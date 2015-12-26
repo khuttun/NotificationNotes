@@ -1,0 +1,12 @@
+<resources>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:actionButtonStyle">@style/NotificationNotesActionButtonStyle</item>
+    </style>
+
+    <style name="NotificationNotesActionButtonStyle" parent="AppTheme">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:minWidth">70dp</item>
+    </style>
+
+</resources>
