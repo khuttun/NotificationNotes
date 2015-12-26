@@ -7,3 +7,5 @@ Features:
 - Save your notes to note list
 - Show/hide note's notification with a switch in note list
 - Remove note by long pressing it in the note list
+
+See https://play.google.com/store/apps/details?id=com.khuttun.notificationnotes
