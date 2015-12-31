@@ -39,5 +39,4 @@
         app:elevation="6dp"
         app:pressedTranslationZ="12dp"
         android:onClick="addNote"/>
-
 </RelativeLayout>

@@ -26,5 +26,4 @@
         android:layout_below="@id/note_title_input"
         android:hint="@string/text_hint"
         android:inputType="textCapSentences"/>
-
 </RelativeLayout>
