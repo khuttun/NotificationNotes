@@ -4,4 +4,12 @@
 /.idea/libraries
 .DS_Store
 /build
+/bin
 /captures
+
+Thumbs.db
+*~
+*.autosav
+*.autosave
+\#*
+*\#
