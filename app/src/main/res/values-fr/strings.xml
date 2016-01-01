@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Notification Notes</string>
+    <string name="save_note_text">Sauvegarder</string>
+    <string name="title_hint">Titre</string>
+    <string name="text_hint">Texte de la note</string>
+    <string name="no_notes">Aucune note ajoutée.</string>
+</resources>
