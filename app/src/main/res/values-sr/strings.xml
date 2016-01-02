@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Обавештавајуће белешке</string>
+    <string name="save_note_text">САЧУВАЈ</string>
+    <string name="title_hint">Наслов</string>
+    <string name="text_hint">Текст белешке</string>
+    <string name="no_notes">Нема додатих белешки.</string>
+</resources>
