@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Notification Notes</string>
+    <string name="no_notes">Es wurden noch keine Notizen hinzugefügt.</string>
+    <string name="save_note_text">Speichern</string>
+    <string name="text_hint">Text der Notiz</string>
+    <string name="title_hint">Titel der Notiz</string>
+</resources>
