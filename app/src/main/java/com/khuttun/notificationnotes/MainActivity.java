@@ -1,6 +1,7 @@
 package com.khuttun.notificationnotes;
 
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -102,6 +103,8 @@ public class MainActivity extends AppCompatActivity
         notificationBuilder.setSmallIcon(R.drawable.pen);
         notificationBuilder.setOngoing(true);
         notificationBuilder.setPriority(NotificationCompat.PRIORITY_LOW);
+        notificationBuilder.setContentIntent(
+            PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0));
 
         this.notesListAdapter = new NotesListAdapter(
             (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE),
