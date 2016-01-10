@@ -81,6 +81,11 @@ public class MainActivity extends AppCompatActivity
         startActivityForResult(new Intent(this, AddNoteActivity.class), ADD_NOTE_REQ);
     }
 
+    public void deleteNote(int notePos)
+    {
+        this.notesListAdapter.deleteNote(notePos);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
@@ -108,7 +113,8 @@ public class MainActivity extends AppCompatActivity
 
         this.notesListAdapter = new NotesListAdapter(
             (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE),
-            notificationBuilder);
+            notificationBuilder,
+            getSupportFragmentManager());
 
         RecyclerView noteListView = (RecyclerView) findViewById(R.id.notes_recycler_view);
         noteListView.setLayoutManager(new LinearLayoutManager(this));

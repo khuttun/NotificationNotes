@@ -2,6 +2,7 @@ package com.khuttun.notificationnotes;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
@@ -22,6 +23,7 @@ class NotesListAdapter
 {
     private NotificationManager notificationManager;
     private NotificationCompat.Builder notificationBuilder;
+    private FragmentManager fragmentManager;
     private ArrayList<NotificationNote> notes;
 
     /**
@@ -35,8 +37,9 @@ class NotesListAdapter
         public TextView textView;
         public SwitchCompat switchView;
         private NotesController notesController;
+        private FragmentManager fragmentManager;
 
-        public ViewHolder(View v, NotesController notesController)
+        public ViewHolder(View v, NotesController notesController, FragmentManager fragmentManager)
         {
             super(v);
 
@@ -44,6 +47,7 @@ class NotesListAdapter
             this.textView = (TextView) v.findViewById(R.id.note_text);
             this.switchView = (SwitchCompat) v.findViewById(R.id.note_switch);
             this.notesController = notesController;
+            this.fragmentManager = fragmentManager;
 
             v.setOnLongClickListener(this);
             this.switchView.setOnCheckedChangeListener(this);
@@ -52,7 +56,9 @@ class NotesListAdapter
         @Override
         public boolean onLongClick(View v)
         {
-            this.notesController.onNoteLongClick(getAdapterPosition());
+            DeleteNoteDialogFragment.newInstance(
+                getAdapterPosition(), this.titleView.getText().toString()).show(
+                this.fragmentManager, "deleteNoteDialog");
             return true;
         }
 
@@ -63,10 +69,13 @@ class NotesListAdapter
         }
     }
 
-    public NotesListAdapter(NotificationManager notificationManager, NotificationCompat.Builder notificationBuilder)
+    public NotesListAdapter(NotificationManager notificationManager,
+                            NotificationCompat.Builder notificationBuilder,
+                            FragmentManager fragmentManager)
     {
         this.notificationManager = notificationManager;
         this.notificationBuilder = notificationBuilder;
+        this.fragmentManager = fragmentManager;
         this.notes = new ArrayList<>();
     }
 
@@ -74,7 +83,7 @@ class NotesListAdapter
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.note, parent, false);
-        ViewHolder vh = new ViewHolder(v, this);
+        ViewHolder vh = new ViewHolder(v, this, this.fragmentManager);
         return vh;
     }
 
@@ -91,14 +100,6 @@ class NotesListAdapter
     public int getItemCount()
     {
         return this.notes.size();
-    }
-
-    @Override
-    public void onNoteLongClick(int position)
-    {
-        this.notificationManager.cancel(this.notes.get(position).id);
-        this.notes.remove(position);
-        notifyItemRemoved(position);
     }
 
     @Override
@@ -129,6 +130,13 @@ class NotesListAdapter
         this.notes.add(n);
         notifyItemInserted(this.notes.size() - 1);
         updateNotification(n);
+    }
+
+    public void deleteNote(int position)
+    {
+        this.notificationManager.cancel(this.notes.get(position).id);
+        this.notes.remove(position);
+        notifyItemRemoved(position);
     }
 
     /**
