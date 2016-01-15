@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Notification Notes</string>
+    <string name="save_note_text">GUARDAR</string>
+    <string name="title_hint">Titulo</string>
+    <string name="text_hint">Texto de la nota</string>
+    <string name="no_notes">No se han añadido notas aun.</string>
+    <string name="dialog_delete_note">Eliminar nota</string>
+    <string name="delete">Eliminar</string>
+    <string name="cancel">Cancelar</string>
+</resources>
