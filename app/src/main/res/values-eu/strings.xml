@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Notification Notes</string>
+    <string name="save_note_text">GORDE</string>
+    <string name="title_hint">Titulua</string>
+    <string name="text_hint">Oharraren testua</string>
+    <string name="no_notes">Ez da oharrik gehitu oraindik.</string>
+    <string name="dialog_delete_note">Oharra ezabatu</string>
+    <string name="delete">Ezabatu</string>
+    <string name="cancel">Utzi</string>
+</resources>
