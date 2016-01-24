@@ -130,29 +130,8 @@ public class MainActivity extends AppCompatActivity
         super.onPause();
         Log.d(Globals.TAG, "Pausing");
 
-        JSONArray jsonArray = new JSONArray();
-        ArrayList<NotificationNote> notes = this.notesListAdapter.getNotes();
-        for (int i = 0; i < notes.size(); ++i)
-        {
-            JSONObject jsonObject = new JSONObject();
-            NotificationNote n = notes.get(i);
-            try
-            {
-                jsonObject.put("id", n.id);
-                jsonObject.put("title", n.title);
-                jsonObject.put("text", n.text);
-                jsonObject.put("isVisible", n.isVisible);
-                jsonArray.put(jsonObject);
-            } catch (JSONException e)
-            {
-                e.printStackTrace();
-            }
-        }
-
-        Log.d(Globals.TAG, jsonArray.toString());
-
         SharedPreferences.Editor prefs = getPreferences(Context.MODE_PRIVATE).edit();
-        prefs.putString(NOTES_PREF_NAME, jsonArray.toString());
+        prefs.putString(NOTES_PREF_NAME, Globals.noteListToJson(this.notesListAdapter.getNotes()));
         prefs.commit();
     }
 
@@ -162,25 +141,8 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
         Log.d(Globals.TAG, "Resuming");
 
-        ArrayList<NotificationNote> notes = new ArrayList<>();
-
-        try
-        {
-            JSONArray jsonArray = new JSONArray(getPreferences(Context.MODE_PRIVATE).getString(NOTES_PREF_NAME, "[]"));
-            Log.d(Globals.TAG, jsonArray.toString());
-            for (int i = 0; i < jsonArray.length(); ++i)
-            {
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                NotificationNote n = new NotificationNote(jsonObject.getInt("id"), jsonObject.getString("title"),
-                    jsonObject.getString("text"), jsonObject.getBoolean("isVisible"));
-                notes.add(n);
-            }
-        } catch (JSONException e)
-        {
-            e.printStackTrace();
-        }
-
-        this.notesListAdapter.setNotes(notes);
+        this.notesListAdapter.setNotes(Globals.jsonToNoteList(
+            getPreferences(Context.MODE_PRIVATE).getString(NOTES_PREF_NAME, "[]")));
 
         // Add note if there is something to add
         if (titleToAdd != null && textToAdd != null)
