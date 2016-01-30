@@ -56,7 +56,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private static final String NOTES_PREF_NAME = "notes";
     private static final int ADD_NOTE_REQ = 1;
 
     private NotesListAdapter notesListAdapter;
@@ -111,7 +110,7 @@ public class MainActivity extends AppCompatActivity
         Log.d(Globals.TAG, "Pausing");
 
         SharedPreferences.Editor prefs = getPreferences(Context.MODE_PRIVATE).edit();
-        prefs.putString(NOTES_PREF_NAME, Globals.noteListToJson(this.notesListAdapter.getNotes()));
+        prefs.putString(Globals.NOTES_PREF_NAME, Globals.noteListToJson(this.notesListAdapter.getNotes()));
         prefs.commit();
     }
 
@@ -122,7 +121,7 @@ public class MainActivity extends AppCompatActivity
         Log.d(Globals.TAG, "Resuming");
 
         this.notesListAdapter.setNotes(Globals.jsonToNoteList(
-            getPreferences(Context.MODE_PRIVATE).getString(NOTES_PREF_NAME, "[]")));
+            getPreferences(Context.MODE_PRIVATE).getString(Globals.NOTES_PREF_NAME, "[]")));
 
         // Add note if there is something to add
         if (titleToAdd != null && textToAdd != null)

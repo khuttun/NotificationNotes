@@ -10,6 +10,8 @@ final class Globals
 {
     public static final String TAG = "Notification Notes";
 
+    public static final String NOTES_PREF_NAME = "notes";
+
     public static String noteListToJson(ArrayList<NotificationNote> noteList)
     {
         JSONArray jsonArray = new JSONArray();
