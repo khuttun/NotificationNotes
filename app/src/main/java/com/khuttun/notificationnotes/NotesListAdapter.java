@@ -1,9 +1,8 @@
 package com.khuttun.notificationnotes;
 
-import android.app.Notification;
-import android.app.NotificationManager;
+import android.content.Context;
+import android.content.Intent;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
 import android.view.LayoutInflater;
@@ -21,8 +20,7 @@ class NotesListAdapter
     extends RecyclerView.Adapter<NotesListAdapter.ViewHolder>
     implements NotesController
 {
-    private NotificationManager notificationManager;
-    private NotificationCompat.Builder notificationBuilder;
+    private Context context;
     private FragmentManager fragmentManager;
     private ArrayList<NotificationNote> notes;
 
@@ -69,12 +67,9 @@ class NotesListAdapter
         }
     }
 
-    public NotesListAdapter(NotificationManager notificationManager,
-                            NotificationCompat.Builder notificationBuilder,
-                            FragmentManager fragmentManager)
+    public NotesListAdapter(Context context, FragmentManager fragmentManager)
     {
-        this.notificationManager = notificationManager;
-        this.notificationBuilder = notificationBuilder;
+        this.context = context;
         this.fragmentManager = fragmentManager;
         this.notes = new ArrayList<>();
     }
@@ -106,8 +101,11 @@ class NotesListAdapter
     public void onNoteCheckedChanged(int position, boolean isChecked)
     {
         NotificationNote n = this.notes.get(position);
-        n.isVisible = isChecked;
-        updateNotification(n);
+        if (isChecked != n.isVisible)
+        {
+            n.isVisible = isChecked;
+            setNotification(n);
+        }
     }
 
     public ArrayList<NotificationNote> getNotes()
@@ -119,24 +117,23 @@ class NotesListAdapter
     {
         this.notes = notes;
         notifyDataSetChanged();
-        for (int i = 0; i < this.notes.size(); ++i)
-            updateNotification(this.notes.get(i));
     }
 
     public void addNote(String title, String text)
     {
-        int id = getId();
-        NotificationNote n = new NotificationNote(id, title, text, true);
+        NotificationNote n = new NotificationNote(getId(), title, text, true);
         this.notes.add(n);
         notifyItemInserted(this.notes.size() - 1);
-        updateNotification(n);
+        setNotification(n);
     }
 
     public void deleteNote(int position)
     {
-        this.notificationManager.cancel(this.notes.get(position).id);
+        NotificationNote n = this.notes.get(position);
         this.notes.remove(position);
         notifyItemRemoved(position);
+        n.isVisible = false;
+        setNotification(n);
     }
 
     /**
@@ -164,16 +161,19 @@ class NotesListAdapter
         return id;
     }
 
-    private void updateNotification(NotificationNote n)
+    private void setNotification(NotificationNote n)
     {
+        Intent in = new Intent(this.context, NotificationService.class);
+
+        in.putExtra(NotificationService.ID, n.id);
+        in.putExtra(NotificationService.SHOW, n.isVisible);
+
         if (n.isVisible)
         {
-            this.notificationBuilder.setContentTitle(n.title);
-            this.notificationBuilder.setContentText(n.text);
-            Notification notification = this.notificationBuilder.build();
-            this.notificationManager.notify(n.id, notification);
+            in.putExtra(NotificationService.TITLE, n.title);
+            in.putExtra(NotificationService.TEXT, n.text);
         }
-        else
-            this.notificationManager.cancel(n.id);
+
+        this.context.startService(in);
     }
 }

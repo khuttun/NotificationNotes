@@ -1,23 +1,14 @@
 package com.khuttun.notificationnotes;
 
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -104,24 +95,13 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this);
-        notificationBuilder.setSmallIcon(R.drawable.pen);
-        notificationBuilder.setOngoing(true);
-        notificationBuilder.setPriority(NotificationCompat.PRIORITY_LOW);
-        notificationBuilder.setContentIntent(
-            PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0));
-
-        this.notesListAdapter = new NotesListAdapter(
-            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE),
-            notificationBuilder,
-            getSupportFragmentManager());
+        this.notesListAdapter = new NotesListAdapter(this, getSupportFragmentManager());
 
         RecyclerView noteListView = (RecyclerView) findViewById(R.id.notes_recycler_view);
         noteListView.setLayoutManager(new LinearLayoutManager(this));
         noteListView.setAdapter(this.notesListAdapter);
 
-        this.noteListObserver = new EmptyNoteListObserver(
-            noteListView, findViewById(R.id.empty_text_view));
+        this.noteListObserver = new EmptyNoteListObserver(noteListView, findViewById(R.id.empty_text_view));
     }
 
     @Override
