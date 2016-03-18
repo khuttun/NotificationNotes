@@ -1,10 +1,11 @@
 package com.khuttun.notificationnotes;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +21,7 @@ class NotesListAdapter
     extends RecyclerView.Adapter<NotesListAdapter.ViewHolder>
     implements NotesController
 {
-    private Context context;
+    private Activity context;
     private FragmentManager fragmentManager;
     private ArrayList<NotificationNote> notes;
 
@@ -29,7 +30,7 @@ class NotesListAdapter
      * It also listens to UI actions in the view and forwards the actions to NotesController.
      */
     public static class ViewHolder extends RecyclerView.ViewHolder
-        implements View.OnLongClickListener, CompoundButton.OnCheckedChangeListener
+        implements View.OnClickListener, View.OnLongClickListener, CompoundButton.OnCheckedChangeListener
     {
         public TextView titleView;
         public TextView textView;
@@ -47,8 +48,15 @@ class NotesListAdapter
             this.notesController = notesController;
             this.fragmentManager = fragmentManager;
 
+            v.setOnClickListener(this);
             v.setOnLongClickListener(this);
             this.switchView.setOnCheckedChangeListener(this);
+        }
+
+        @Override
+        public void onClick(View v)
+        {
+            this.notesController.onNoteClicked(getAdapterPosition());
         }
 
         @Override
@@ -67,7 +75,7 @@ class NotesListAdapter
         }
     }
 
-    public NotesListAdapter(Context context, FragmentManager fragmentManager)
+    public NotesListAdapter(Activity context, FragmentManager fragmentManager)
     {
         this.context = context;
         this.fragmentManager = fragmentManager;
@@ -95,6 +103,18 @@ class NotesListAdapter
     public int getItemCount()
     {
         return this.notes.size();
+    }
+
+    @Override
+    public void onNoteClicked(int position)
+    {
+        Log.d(Globals.TAG, "Note clicked " + position);
+        NotificationNote n = this.notes.get(position);
+        Intent in = new Intent(this.context, AddNoteActivity.class);
+        in.putExtra(AddNoteActivity.TITLE, n.title);
+        in.putExtra(AddNoteActivity.TEXT, n.text);
+        in.putExtra(AddNoteActivity.NOTE_INDEX, position);
+        context.startActivityForResult(in, AddNoteActivity.EDIT_REQ);
     }
 
     @Override
@@ -134,6 +154,17 @@ class NotesListAdapter
         notifyItemRemoved(position);
         n.isVisible = false;
         setNotification(n);
+    }
+
+    public void updateNote(int position, String title, String text)
+    {
+        NotificationNote n = this.notes.get(position);
+        n.title = title;
+        n.text = text;
+        notifyItemChanged(position);
+
+        if (n.isVisible)
+            setNotification(n);
     }
 
     /**

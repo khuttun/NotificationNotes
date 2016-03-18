@@ -56,19 +56,32 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private static final int ADD_NOTE_REQ = 1;
+    /**
+     * AddNoteResult is used to store the result from "Add note" activity.
+     */
+    private static class AddNoteResult
+    {
+        public int reqCode;
+        public String title;
+        public String text;
+        public int noteIndex;
+
+        public AddNoteResult(int reqCode, String title, String text, int noteIndex)
+        {
+            this.reqCode = reqCode;
+            this.title = title;
+            this.text = text;
+            this.noteIndex = noteIndex;
+        }
+    }
 
     private NotesListAdapter notesListAdapter;
-
-    // Data for new note to add
-    private String titleToAdd = null;
-    private String textToAdd = null;
-
+    private AddNoteResult addNoteResult;
     private EmptyNoteListObserver noteListObserver;
 
     public void addNote(View view)
     {
-        startActivityForResult(new Intent(this, AddNoteActivity.class), ADD_NOTE_REQ);
+        startActivityForResult(new Intent(this, AddNoteActivity.class), AddNoteActivity.ADD_REQ);
     }
 
     public void deleteNote(int notePos)
@@ -80,11 +93,14 @@ public class MainActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         Log.d(Globals.TAG, "Req " + requestCode + ", result " + resultCode);
-        if (requestCode == ADD_NOTE_REQ && resultCode == RESULT_OK)
+        if (resultCode == RESULT_OK)
         {
-            titleToAdd = data.getStringExtra("title");
-            textToAdd = data.getStringExtra("text");
-            Log.d(Globals.TAG, "Note to add: " + titleToAdd + ": " + textToAdd);
+            this.addNoteResult = new AddNoteResult(
+                requestCode,
+                data.getStringExtra(AddNoteActivity.TITLE),
+                data.getStringExtra(AddNoteActivity.TEXT),
+                data.getIntExtra(AddNoteActivity.NOTE_INDEX, -1));
+            Log.d(Globals.TAG, "Caching result: " + this.addNoteResult.title + ": " + this.addNoteResult.text);
         }
     }
 
@@ -100,6 +116,7 @@ public class MainActivity extends AppCompatActivity
         noteListView.setLayoutManager(new LinearLayoutManager(this));
         noteListView.setAdapter(this.notesListAdapter);
 
+        this.addNoteResult = null;
         this.noteListObserver = new EmptyNoteListObserver(noteListView, findViewById(R.id.empty_text_view));
     }
 
@@ -123,13 +140,25 @@ public class MainActivity extends AppCompatActivity
         this.notesListAdapter.setNotes(Globals.jsonToNoteList(
             getPreferences(Context.MODE_PRIVATE).getString(Globals.NOTES_PREF_NAME, "[]")));
 
-        // Add note if there is something to add
-        if (titleToAdd != null && textToAdd != null)
+        // Unprocessed result from "Add note" activity
+        if (this.addNoteResult != null)
         {
-            Log.d(Globals.TAG, "Found note to add: " + titleToAdd + " - " + textToAdd);
-            notesListAdapter.addNote(titleToAdd, textToAdd);
-            titleToAdd = null;
-            textToAdd = null;
+            Log.d(Globals.TAG, "Result from AddNoteActivity: " + this.addNoteResult.reqCode + " - " +
+                this.addNoteResult.title + " - " + this.addNoteResult.text + " - " + this.addNoteResult.noteIndex);
+
+            switch (this.addNoteResult.reqCode)
+            {
+                case AddNoteActivity.ADD_REQ:
+                    this.notesListAdapter.addNote(this.addNoteResult.title, this.addNoteResult.text);
+                    break;
+
+                case AddNoteActivity.EDIT_REQ:
+                    this.notesListAdapter.updateNote(
+                        this.addNoteResult.noteIndex, this.addNoteResult.title, this.addNoteResult.text);
+                    break;
+            }
+
+            this.addNoteResult = null;
         }
     }
 }

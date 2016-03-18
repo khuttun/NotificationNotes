@@ -8,4 +8,6 @@
     <string name="dialog_delete_note">Delete note</string>
     <string name="delete">Delete</string>
     <string name="cancel">Cancel</string>
+    <string name="new_note">New note</string>
+    <string name="edit_note">Edit note</string>
 </resources>

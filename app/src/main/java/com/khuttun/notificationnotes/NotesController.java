@@ -5,5 +5,6 @@ package com.khuttun.notificationnotes;
  */
 interface NotesController
 {
+    void onNoteClicked(int position);
     void onNoteCheckedChanged(int position, boolean isChecked);
 }
