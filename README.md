@@ -8,7 +8,10 @@ It is [free/libre software](https://www.gnu.org/philosophy/free-sw.html).
 
 - Save your notes to note list
 - Show/hide note's notification with a switch in note list
+- Edit notes by touching them in the notes list
 - Remove note by long pressing it in the note list
+- Open the note list by touching a notification
+- Existing notifications are restored after restart
 
 ## Download
 
