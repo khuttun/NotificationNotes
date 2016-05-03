@@ -5,4 +5,9 @@
     <string name="title_hint">Наслов</string>
     <string name="text_hint">Текст белешке</string>
     <string name="no_notes">Нема додатих белешки.</string>
+    <string name="dialog_delete_note">Обрисати белешку</string>
+    <string name="delete">Обриши</string>
+    <string name="cancel">Одустани</string>
+    <string name="new_note">Нова белешка</string>
+    <string name="edit_note">Уреди белешку</string>
 </resources>
