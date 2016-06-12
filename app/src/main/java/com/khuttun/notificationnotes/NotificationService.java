@@ -56,6 +56,7 @@ public class NotificationService extends IntentService
         {
             this.notificationBuilder.setContentTitle(intent.getStringExtra(TITLE));
             this.notificationBuilder.setContentText(intent.getStringExtra(TEXT));
+            this.notificationBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(intent.getStringExtra(TEXT)));
             Notification notification = this.notificationBuilder.build();
             this.notificationManager.notify(id, notification);
         }
