@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ class NotesListAdapter
     {
         public TextView titleView;
         public TextView textView;
+        public ImageView imageViewShare;
         public SwitchCompat switchView;
         private NotesController notesController;
         private FragmentManager fragmentManager;
@@ -44,19 +46,25 @@ class NotesListAdapter
 
             this.titleView = (TextView) v.findViewById(R.id.note_title);
             this.textView = (TextView) v.findViewById(R.id.note_text);
+            this.imageViewShare = (ImageView) v.findViewById(R.id.image_share);
             this.switchView = (SwitchCompat) v.findViewById(R.id.note_switch);
             this.notesController = notesController;
             this.fragmentManager = fragmentManager;
 
             v.setOnClickListener(this);
             v.setOnLongClickListener(this);
+            this.imageViewShare.setOnClickListener(this);
             this.switchView.setOnCheckedChangeListener(this);
         }
 
         @Override
         public void onClick(View v)
         {
-            this.notesController.onNoteClicked(getAdapterPosition());
+            if (v.getId() == R.id.image_share) {
+                this.notesController.onShareNoteClicked(getAdapterPosition());
+            } else {
+                this.notesController.onNoteClicked(getAdapterPosition());
+            }
         }
 
         @Override
@@ -75,6 +83,9 @@ class NotesListAdapter
         }
     }
 
+    /**
+     * Adapter
+     */
     public NotesListAdapter(Activity context, FragmentManager fragmentManager)
     {
         this.context = context;
@@ -126,6 +137,21 @@ class NotesListAdapter
             n.isVisible = isChecked;
             setNotification(n);
         }
+    }
+
+    @Override
+    public void onShareNoteClicked(int position) {
+        NotificationNote n = this.notes.get(position);
+        shareNote(n);
+    }
+
+    private void shareNote(NotificationNote n) {
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TITLE, n.title);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, n.text);
+        sendIntent.setType("text/plain");
+        this.context.startActivity(sendIntent);
     }
 
     public ArrayList<NotificationNote> getNotes()
