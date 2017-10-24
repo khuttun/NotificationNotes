@@ -7,4 +7,5 @@ interface NotesController
 {
     void onNoteClicked(int position);
     void onNoteCheckedChanged(int position, boolean isChecked);
+    void onShareNoteClicked(int position);
 }

@@ -33,6 +33,16 @@
             android:textColor="#767676"
             android:id="@+id/note_text"/>
 
+        <ImageView
+            android:id="@+id/image_share"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_margin="3dp"
+            android:clickable="true"
+            android:layout_toLeftOf="@+id/note_switch"
+            android:src="@drawable/ic_action_share"/>
+
         <android.support.v7.widget.SwitchCompat
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
