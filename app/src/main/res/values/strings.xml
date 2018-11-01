@@ -10,4 +10,5 @@
     <string name="cancel">Cancel</string>
     <string name="new_note">New note</string>
     <string name="edit_note">Edit note</string>
+    <string name="channel_name">Notes</string>
 </resources>
