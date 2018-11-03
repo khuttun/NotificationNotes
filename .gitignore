@@ -1,13 +1,14 @@
 .gradle
 /local.properties
-/.idea/workspace.xml
-/.idea/libraries
+/.idea
 .DS_Store
 /build
 /bin
 /captures
-
+/gradle
 Thumbs.db
+gradlew
+gradlew.bat
 *~
 *.autosav
 *.autosave
