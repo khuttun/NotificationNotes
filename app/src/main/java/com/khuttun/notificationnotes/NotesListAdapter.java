@@ -108,7 +108,7 @@ class NotesListAdapter
     @Override
     public void onNoteClicked(int position)
     {
-        Log.d(Globals.TAG, "Note clicked " + position);
+        if (Globals.LOG) Log.d(Globals.TAG, "Note clicked " + position);
         NotificationNote n = this.notes.get(position);
         Intent in = new Intent(this.context, AddNoteActivity.class);
         in.putExtra(AddNoteActivity.TITLE, n.title);

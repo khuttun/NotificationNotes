@@ -8,6 +8,8 @@ import java.util.ArrayList;
 
 final class Globals
 {
+    public static final boolean LOG = true;
+
     public static final String TAG = "Notification Notes";
 
     public static final String NOTES_PREF_NAME = "notes";

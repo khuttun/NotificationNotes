@@ -60,7 +60,7 @@ public class AddNoteActivity extends AppCompatActivity
             case R.id.save_note:
                 String title = this.titleInput.getText().toString();
                 String text = this.textInput.getText().toString();
-                Log.d(Globals.TAG, "Saving note. Title: " + title + ", Text: " + text);
+                if (Globals.LOG) Log.d(Globals.TAG, "Saving note. Title: " + title + ", Text: " + text);
 
                 Intent data = new Intent();
                 data.putExtra(TITLE, title);

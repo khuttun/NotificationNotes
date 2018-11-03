@@ -30,14 +30,14 @@ public class NotificationService extends IntentService
     public NotificationService()
     {
         super("NotificationService");
-        Log.d(Globals.TAG, "NotificationService ctor");
+        if (Globals.LOG) Log.d(Globals.TAG, "NotificationService ctor");
     }
 
     @Override
     public void onCreate()
     {
         super.onCreate();
-        Log.d(Globals.TAG, "NotificationService onCreate");
+        if (Globals.LOG) Log.d(Globals.TAG, "NotificationService onCreate");
 
         this.notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -61,7 +61,7 @@ public class NotificationService extends IntentService
     {
         int id = intent.getIntExtra(ID, -1);
         boolean show = intent.getBooleanExtra(SHOW, false);
-        Log.d(Globals.TAG, "NotificationService: " + id + " - " + show);
+        if (Globals.LOG) Log.d(Globals.TAG, "NotificationService: " + id + " - " + show);
 
         if (show)
         {

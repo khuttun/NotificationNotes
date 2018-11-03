@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void onChanged()
         {
-            Log.d(Globals.TAG, "List changed. Count " + noteList.getAdapter().getItemCount());
+            if (Globals.LOG) Log.d(Globals.TAG, "List changed. Count " + noteList.getAdapter().getItemCount());
             if (noteList.getAdapter().getItemCount() > 0)
             {
                 this.noteList.setVisibility(View.VISIBLE);
@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        Log.d(Globals.TAG, "Req " + requestCode + ", result " + resultCode);
+        if (Globals.LOG) Log.d(Globals.TAG, "Req " + requestCode + ", result " + resultCode);
         if (resultCode == RESULT_OK)
         {
             this.addNoteResult = new AddNoteResult(
@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity
                 data.getStringExtra(AddNoteActivity.TITLE),
                 data.getStringExtra(AddNoteActivity.TEXT),
                 data.getIntExtra(AddNoteActivity.NOTE_INDEX, -1));
-            Log.d(Globals.TAG, "Caching result: " + this.addNoteResult.title + ": " + this.addNoteResult.text);
+            if (Globals.LOG) Log.d(Globals.TAG, "Caching result: " + this.addNoteResult.title + ": " + this.addNoteResult.text);
         }
     }
 
@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity
     protected void onPause()
     {
         super.onPause();
-        Log.d(Globals.TAG, "Pausing");
+        if (Globals.LOG) Log.d(Globals.TAG, "Pausing");
 
         SharedPreferences.Editor prefs = getPreferences(Context.MODE_PRIVATE).edit();
         prefs.putString(Globals.NOTES_PREF_NAME, Globals.noteListToJson(this.notesListAdapter.getNotes()));
@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity
     protected void onResume()
     {
         super.onResume();
-        Log.d(Globals.TAG, "Resuming");
+        if (Globals.LOG) Log.d(Globals.TAG, "Resuming");
 
         this.notesListAdapter.setNotes(Globals.jsonToNoteList(
             getPreferences(Context.MODE_PRIVATE).getString(Globals.NOTES_PREF_NAME, "[]")));
@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity
         // Unprocessed result from "Add note" activity
         if (this.addNoteResult != null)
         {
-            Log.d(Globals.TAG, "Result from AddNoteActivity: " + this.addNoteResult.reqCode + " - " +
+            if (Globals.LOG) Log.d(Globals.TAG, "Result from AddNoteActivity: " + this.addNoteResult.reqCode + " - " +
                 this.addNoteResult.title + " - " + this.addNoteResult.text + " - " + this.addNoteResult.noteIndex);
 
             switch (this.addNoteResult.reqCode)

@@ -17,7 +17,7 @@ public class BootCompletedReceiver extends BroadcastReceiver
     {
         String notesJson = context.getSharedPreferences("MainActivity", Context.MODE_PRIVATE)
             .getString(Globals.NOTES_PREF_NAME, "[]");
-        Log.d(Globals.TAG, "Boot completed: " + notesJson);
+        if (Globals.LOG) Log.d(Globals.TAG, "Boot completed: " + notesJson);
 
         ArrayList<NotificationNote> noteList = Globals.jsonToNoteList(notesJson);
         for (int i = 0; i < noteList.size(); ++i)

@@ -34,7 +34,7 @@ public class DeleteNoteDialogFragment extends DialogFragment
             {
                 public void onClick(DialogInterface dialog, int id)
                 {
-                    Log.d(Globals.TAG, "Confirm delete of note at position " + notePos);
+                    if (Globals.LOG) Log.d(Globals.TAG, "Confirm delete of note at position " + notePos);
                     ((MainActivity) getActivity()).deleteNote(notePos);
                 }
             })
@@ -42,7 +42,7 @@ public class DeleteNoteDialogFragment extends DialogFragment
             {
                 public void onClick(DialogInterface dialog, int id)
                 {
-                    Log.d(Globals.TAG, "Cancel delete note at position " + notePos);
+                    if (Globals.LOG) Log.d(Globals.TAG, "Cancel delete note at position " + notePos);
                 }
             });
 
