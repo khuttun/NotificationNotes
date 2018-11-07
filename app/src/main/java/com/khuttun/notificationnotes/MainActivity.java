@@ -4,10 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 public class MainActivity extends AppCompatActivity
@@ -50,7 +53,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         @Override
-        public void	onItemRangeRemoved(int positionStart, int itemCount)
+        public void onItemRangeRemoved(int positionStart, int itemCount)
         {
             onChanged();
         }
@@ -72,6 +75,12 @@ public class MainActivity extends AppCompatActivity
             this.title = title;
             this.text = text;
             this.noteIndex = noteIndex;
+        }
+
+        @Override
+        public String toString()
+        {
+            return "{" + this.reqCode + ", " + this.title + ", " + this.text + ", " + this.noteIndex + "}";
         }
     }
 
@@ -96,11 +105,11 @@ public class MainActivity extends AppCompatActivity
         if (resultCode == RESULT_OK)
         {
             this.addNoteResult = new AddNoteResult(
-                requestCode,
-                data.getStringExtra(AddNoteActivity.TITLE),
-                data.getStringExtra(AddNoteActivity.TEXT),
-                data.getIntExtra(AddNoteActivity.NOTE_INDEX, -1));
-            if (Globals.LOG) Log.d(Globals.TAG, "Caching result: " + this.addNoteResult.title + ": " + this.addNoteResult.text);
+                    requestCode,
+                    data.getStringExtra(AddNoteActivity.TITLE),
+                    data.getStringExtra(AddNoteActivity.TEXT),
+                    data.getIntExtra(AddNoteActivity.NOTE_INDEX, -1));
+            if (Globals.LOG) Log.d(Globals.TAG, "Caching result: " + this.addNoteResult);
         }
     }
 
@@ -121,12 +130,33 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case R.id.settings:
+                if (Globals.LOG) Log.d(Globals.TAG, "Settings menu item selected");
+                startActivity(new Intent(this, SettingsActivity.class));
+                break;
+        }
+
+        return true;
+    }
+
+    @Override
     protected void onPause()
     {
         super.onPause();
-        if (Globals.LOG) Log.d(Globals.TAG, "Pausing");
+        if (Globals.LOG) Log.d(Globals.TAG, "Pausing MainActivity");
 
-        SharedPreferences.Editor prefs = getPreferences(Context.MODE_PRIVATE).edit();
+        SharedPreferences.Editor prefs = PreferenceManager.getDefaultSharedPreferences(this).edit();
         prefs.putString(Globals.NOTES_PREF_NAME, Globals.noteListToJson(this.notesListAdapter.getNotes()));
         prefs.commit();
     }
@@ -135,17 +165,15 @@ public class MainActivity extends AppCompatActivity
     protected void onResume()
     {
         super.onResume();
-        if (Globals.LOG) Log.d(Globals.TAG, "Resuming");
+        if (Globals.LOG) Log.d(Globals.TAG, "Resuming MainActivity");
 
         this.notesListAdapter.setNotes(Globals.jsonToNoteList(
-            getPreferences(Context.MODE_PRIVATE).getString(Globals.NOTES_PREF_NAME, "[]")));
+                PreferenceManager.getDefaultSharedPreferences(this).getString(Globals.NOTES_PREF_NAME, "[]")));
 
         // Unprocessed result from "Add note" activity
         if (this.addNoteResult != null)
         {
-            if (Globals.LOG) Log.d(Globals.TAG, "Result from AddNoteActivity: " + this.addNoteResult.reqCode + " - " +
-                this.addNoteResult.title + " - " + this.addNoteResult.text + " - " + this.addNoteResult.noteIndex);
-
+            if (Globals.LOG) Log.d(Globals.TAG, "Result from AddNoteActivity: " + this.addNoteResult);
             switch (this.addNoteResult.reqCode)
             {
                 case AddNoteActivity.ADD_REQ:
@@ -154,7 +182,7 @@ public class MainActivity extends AppCompatActivity
 
                 case AddNoteActivity.EDIT_REQ:
                     this.notesListAdapter.updateNote(
-                        this.addNoteResult.noteIndex, this.addNoteResult.title, this.addNoteResult.text);
+                            this.addNoteResult.noteIndex, this.addNoteResult.title, this.addNoteResult.text);
                     break;
             }
 

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="group_notif_pref_key">group_notif_pref</string>
+</resources>

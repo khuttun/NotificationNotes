@@ -3,6 +3,7 @@ package com.khuttun.notificationnotes;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -15,22 +16,28 @@ public class BootCompletedReceiver extends BroadcastReceiver
     @Override
     public void onReceive(Context context, Intent intent)
     {
-        String notesJson = context.getSharedPreferences("MainActivity", Context.MODE_PRIVATE)
-            .getString(Globals.NOTES_PREF_NAME, "[]");
-        if (Globals.LOG) Log.d(Globals.TAG, "Boot completed: " + notesJson);
+        // TODO: Notification doesn't appear because of restrictions introduced in Oreo:
+        // https://developer.android.com/about/versions/oreo/background
 
-        ArrayList<NotificationNote> noteList = Globals.jsonToNoteList(notesJson);
-        for (int i = 0; i < noteList.size(); ++i)
+        ArrayList<NotificationNote> notes = Globals.jsonToNoteList(PreferenceManager
+                .getDefaultSharedPreferences(context).getString(Globals.NOTES_PREF_NAME, "[]"));
+
+        if (Globals.LOG) Log.d(Globals.TAG, "Boot completed, " + notes.size() + " notes");
+
+        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(context
+                .getString(R.string.group_notif_pref_key), false))
         {
-            NotificationNote n = noteList.get(i);
-            if (n.isVisible)
+            NotificationService.setGroupNotification(context, notes);
+        }
+        else
+        {
+            for (int i = 0; i < notes.size(); ++i)
             {
-                context.startService(
-                    new Intent(context, NotificationService.class)
-                        .putExtra(NotificationService.ID, n.id)
-                        .putExtra(NotificationService.SHOW, n.isVisible)
-                        .putExtra(NotificationService.TITLE, n.title)
-                        .putExtra(NotificationService.TEXT, n.text));
+                NotificationNote n = notes.get(i);
+                if (n.isVisible)
+                {
+                    NotificationService.setNotification(context, n);
+                }
             }
         }
     }

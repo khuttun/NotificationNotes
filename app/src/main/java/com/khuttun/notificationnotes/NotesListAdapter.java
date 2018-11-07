@@ -1,7 +1,10 @@
 package com.khuttun.notificationnotes;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
@@ -18,8 +21,8 @@ import java.util.ArrayList;
  * Adapter for the main NotificationNote list.
  */
 class NotesListAdapter
-    extends RecyclerView.Adapter<NotesListAdapter.ViewHolder>
-    implements NotesController
+        extends RecyclerView.Adapter<NotesListAdapter.ViewHolder>
+        implements NotesController
 {
     private Activity context;
     private FragmentManager fragmentManager;
@@ -30,7 +33,7 @@ class NotesListAdapter
      * It also listens to UI actions in the view and forwards the actions to NotesController.
      */
     public static class ViewHolder extends RecyclerView.ViewHolder
-        implements View.OnClickListener, View.OnLongClickListener, CompoundButton.OnCheckedChangeListener
+            implements View.OnClickListener, View.OnLongClickListener, CompoundButton.OnCheckedChangeListener
     {
         public TextView titleView;
         public TextView textView;
@@ -63,8 +66,8 @@ class NotesListAdapter
         public boolean onLongClick(View v)
         {
             DeleteNoteDialogFragment.newInstance(
-                getAdapterPosition(), this.titleView.getText().toString()).show(
-                this.fragmentManager, "deleteNoteDialog");
+                    getAdapterPosition(), this.titleView.getText().toString()).show(
+                    this.fragmentManager, "deleteNoteDialog");
             return true;
         }
 
@@ -164,7 +167,9 @@ class NotesListAdapter
         notifyItemChanged(position);
 
         if (n.isVisible)
+        {
             setNotification(n);
+        }
     }
 
     /**
@@ -194,17 +199,14 @@ class NotesListAdapter
 
     private void setNotification(NotificationNote n)
     {
-        Intent in = new Intent(this.context, NotificationService.class);
-
-        in.putExtra(NotificationService.ID, n.id);
-        in.putExtra(NotificationService.SHOW, n.isVisible);
-
-        if (n.isVisible)
+        if (PreferenceManager.getDefaultSharedPreferences(this.context).getBoolean(this.context
+                .getString(R.string.group_notif_pref_key), false))
         {
-            in.putExtra(NotificationService.TITLE, n.title);
-            in.putExtra(NotificationService.TEXT, n.text);
+            NotificationService.setGroupNotification(this.context, this.notes);
         }
-
-        this.context.startService(in);
+        else
+        {
+            NotificationService.setNotification(this.context, n);
+        }
     }
 }

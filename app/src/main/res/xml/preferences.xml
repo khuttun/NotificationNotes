@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <SwitchPreferenceCompat
+        android:key="@string/group_notif_pref_key"
+        android:title="@string/group_notif_setting_title"
+        android:summary="@string/group_notif_setting_summary"/>
+</PreferenceScreen>
