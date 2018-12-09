@@ -10,11 +10,14 @@ import java.util.ArrayList;
 
 public class SettingsActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener
 {
+    private NotificationMgr notificationMgr;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        this.notificationMgr = new NotificationMgr(this);
     }
 
     @Override
@@ -42,12 +45,12 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
             if (Globals.LOG) Log.d(Globals.TAG, "Group notifications setting changed to " + settingVal);
 
             // Clear all existing notifications and set them again using the new setting value
-            NotificationService.clearAllNotifications(this);
+            this.notificationMgr.clearAllNotifications();
             ArrayList<NotificationNote> notes = Globals.jsonToNoteList(PreferenceManager
                     .getDefaultSharedPreferences(this).getString(Globals.NOTES_PREF_NAME, "[]"));
             if (settingVal)
             {
-                NotificationService.setGroupNotification(this, notes);
+                this.notificationMgr.setGroupNotification(notes);
             }
             else
             {
@@ -56,7 +59,7 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
                     NotificationNote n = notes.get(i);
                     if (n.isVisible)
                     {
-                        NotificationService.setNotification(this, n);
+                        this.notificationMgr.setNotification(n);
                     }
                 }
             }

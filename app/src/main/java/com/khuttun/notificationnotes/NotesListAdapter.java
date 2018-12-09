@@ -1,9 +1,7 @@
 package com.khuttun.notificationnotes;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
@@ -25,6 +23,7 @@ class NotesListAdapter
         implements NotesController
 {
     private Activity context;
+    private NotificationMgr notificationMgr;
     private FragmentManager fragmentManager;
     private ArrayList<NotificationNote> notes;
 
@@ -81,6 +80,7 @@ class NotesListAdapter
     public NotesListAdapter(Activity context, FragmentManager fragmentManager)
     {
         this.context = context;
+        this.notificationMgr = new NotificationMgr(this.context);
         this.fragmentManager = fragmentManager;
         this.notes = new ArrayList<>();
     }
@@ -202,11 +202,11 @@ class NotesListAdapter
         if (PreferenceManager.getDefaultSharedPreferences(this.context).getBoolean(this.context
                 .getString(R.string.group_notif_pref_key), false))
         {
-            NotificationService.setGroupNotification(this.context, this.notes);
+            this.notificationMgr.setGroupNotification(this.notes);
         }
         else
         {
-            NotificationService.setNotification(this.context, n);
+            this.notificationMgr.setNotification(n);
         }
     }
 }

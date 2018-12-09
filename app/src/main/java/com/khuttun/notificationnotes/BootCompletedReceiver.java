@@ -16,18 +16,17 @@ public class BootCompletedReceiver extends BroadcastReceiver
     @Override
     public void onReceive(Context context, Intent intent)
     {
-        // TODO: Notification doesn't appear because of restrictions introduced in Oreo:
-        // https://developer.android.com/about/versions/oreo/background
-
         ArrayList<NotificationNote> notes = Globals.jsonToNoteList(PreferenceManager
                 .getDefaultSharedPreferences(context).getString(Globals.NOTES_PREF_NAME, "[]"));
 
         if (Globals.LOG) Log.d(Globals.TAG, "Boot completed, " + notes.size() + " notes");
 
+        NotificationMgr notificationMgr = new NotificationMgr(context);
+
         if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(context
                 .getString(R.string.group_notif_pref_key), false))
         {
-            NotificationService.setGroupNotification(context, notes);
+            notificationMgr.setGroupNotification(notes);
         }
         else
         {
@@ -36,7 +35,7 @@ public class BootCompletedReceiver extends BroadcastReceiver
                 NotificationNote n = notes.get(i);
                 if (n.isVisible)
                 {
-                    NotificationService.setNotification(context, n);
+                    notificationMgr.setNotification(n);
                 }
             }
         }

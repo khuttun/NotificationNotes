@@ -27,8 +27,6 @@
             android:name=".SettingsActivity"
             android:label="@string/settings" />
 
-        <service android:name=".NotificationService" />
-
         <receiver
             android:name=".BootCompletedReceiver"
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
