@@ -13,6 +13,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity
 {
     /**
@@ -117,6 +119,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        if (Globals.LOG) Log.d(Globals.TAG, "Creating MainActivity");
         setContentView(R.layout.activity_main);
 
         this.notesListAdapter = new NotesListAdapter(this, getSupportFragmentManager());
@@ -127,6 +130,8 @@ public class MainActivity extends AppCompatActivity
 
         this.addNoteResult = null;
         this.noteListObserver = new EmptyNoteListObserver(noteListView, findViewById(R.id.empty_text_view));
+
+        migratePreferences();
     }
 
     @Override
@@ -187,6 +192,37 @@ public class MainActivity extends AppCompatActivity
             }
 
             this.addNoteResult = null;
+        }
+    }
+
+    private void migratePreferences()
+    {
+        // The storage of the notes has changed in version 1.6. Migrate old notes if found.
+        String oldPref = getPreferences(Context.MODE_PRIVATE).getString(Globals.NOTES_PREF_NAME, null);
+        if (oldPref != null)
+        {
+            if (Globals.LOG) Log.d(Globals.TAG, "Migrating old notes pref");
+
+            // Take into account also possibility that there's already notes stored to the new storage
+            String newPref = PreferenceManager.getDefaultSharedPreferences(this).getString(
+                    Globals.NOTES_PREF_NAME,
+                    "[]");
+
+            // Combine old and new versions of the stored notes
+            ArrayList<NotificationNote> notes = Globals.jsonToNoteList(oldPref);
+            if (Globals.LOG) Log.d(Globals.TAG, notes.size() + " notes stored to old pref");
+            notes.addAll(Globals.jsonToNoteList(newPref));
+            if (Globals.LOG) Log.d(Globals.TAG, notes.size() + " notes stored total");
+
+            // Store the combined notes
+            SharedPreferences.Editor newPrefsEditor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+            newPrefsEditor.putString(Globals.NOTES_PREF_NAME, Globals.noteListToJson(notes));
+            newPrefsEditor.commit();
+
+            // Remove the old version
+            SharedPreferences.Editor oldPrefsEditor = getPreferences(Context.MODE_PRIVATE).edit();
+            oldPrefsEditor.remove(Globals.NOTES_PREF_NAME);
+            oldPrefsEditor.commit();
         }
     }
 }
