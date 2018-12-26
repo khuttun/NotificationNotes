@@ -8,7 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 
-public class AddNoteActivity extends AppCompatActivity
+public class AddNoteActivity extends ThemedActivity
 {
     private EditText titleInput;
     private EditText textInput;

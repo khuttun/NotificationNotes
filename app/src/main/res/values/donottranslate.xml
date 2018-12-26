@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="group_notif_pref_key">group_notif_pref</string>
+    <string name="theme_pref_key">theme_pref</string>
+    <string name="theme_pref_value_light">light</string>
+    <string name="theme_pref_value_dark">dark</string>
+    <string name="theme_pref_value_default">@string/theme_pref_value_light</string>
+    <string-array name="theme_pref_values">
+        <item>@string/theme_pref_value_light</item>
+        <item>@string/theme_pref_value_dark</item>
+    </string-array>
 </resources>

@@ -8,7 +8,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
-public class SettingsActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener
+public class SettingsActivity extends ThemedActivity implements SharedPreferences.OnSharedPreferenceChangeListener
 {
     private NotificationMgr notificationMgr;
 
@@ -64,6 +64,13 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
                     }
                 }
             }
+        }
+
+        if (key.equals(getString(R.string.theme_pref_key)))
+        {
+            String settingVal = sharedPrefs.getString(key, "");
+            if (Globals.LOG) Log.d(Globals.TAG, "Theme setting changed to " + settingVal);
+            recreate();
         }
     }
 }

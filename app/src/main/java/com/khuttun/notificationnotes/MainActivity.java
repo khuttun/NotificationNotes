@@ -15,7 +15,7 @@ import android.view.View;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends ThemedActivity
 {
     /**
      * Observe changes in notes list and display an alternate view if the list is empty.

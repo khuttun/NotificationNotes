@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="LightTheme" parent="Theme.AppCompat.Light">
         <item name="android:actionButtonStyle">@style/NotificationNotesActionButtonStyle</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
     </style>
 
-    <style name="NotificationNotesActionButtonStyle" parent="AppTheme">
+    <style name="DarkTheme" parent="Theme.AppCompat">
+        <item name="android:actionButtonStyle">@style/NotificationNotesActionButtonStyle</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+    </style>
+
+    <style name="NotificationNotesActionButtonStyle">
         <item name="android:textSize">14sp</item>
         <item name="android:textStyle">normal</item>
         <item name="android:minWidth">70dp</item>

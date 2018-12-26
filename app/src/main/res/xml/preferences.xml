@@ -2,6 +2,13 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <SwitchPreferenceCompat
         android:key="@string/group_notif_pref_key"
-        android:title="@string/group_notif_setting_title"
-        android:summary="@string/group_notif_setting_summary"/>
+        android:summary="@string/group_notif_setting_summary"
+        android:title="@string/group_notif_setting_title" />
+    <ListPreference
+        android:defaultValue="@string/theme_pref_value_default"
+        android:entries="@array/theme_setting_entries"
+        android:entryValues="@array/theme_pref_values"
+        android:key="@string/theme_pref_key"
+        android:summary="%s"
+        android:title="@string/theme_setting_title" />
 </PreferenceScreen>

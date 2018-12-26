@@ -15,4 +15,11 @@
     <string name="group_notif_title">Notes</string>
     <string name="group_notif_setting_title">Group notifications</string>
     <string name="group_notif_setting_summary">Display all notes in a single notification</string>
+    <string name="theme_setting_title">Theme</string>
+    <string name="theme_setting_entry_light">Light</string>
+    <string name="theme_setting_entry_dark">Dark</string>
+    <string-array name="theme_setting_entries">
+        <item>@string/theme_setting_entry_light</item>
+        <item>@string/theme_setting_entry_dark</item>
+    </string-array>
 </resources>
