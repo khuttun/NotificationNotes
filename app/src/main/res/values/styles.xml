@@ -3,13 +3,11 @@
     <style name="LightTheme" parent="Theme.AppCompat.Light">
         <item name="android:actionButtonStyle">@style/NotificationNotesActionButtonStyle</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
-        <item name="android:navigationBarColor">?android:colorPrimary</item>
     </style>
 
     <style name="DarkTheme" parent="Theme.AppCompat">
         <item name="android:actionButtonStyle">@style/NotificationNotesActionButtonStyle</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
-        <item name="android:navigationBarColor">?android:colorPrimary</item>
     </style>
 
     <style name="NotificationNotesActionButtonStyle">
