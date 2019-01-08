@@ -61,6 +61,7 @@ public class NotificationMgr
                 .getActivity(this.context, 0, new Intent(this.context, MainActivity.class), 0));
         return Builder;
     }
+
     public void setNotification(NotificationNote note)
     {
         if (Globals.LOG) Log.d(Globals.TAG, "Notification: ID " + note.id + ", show " + note.isVisible);
@@ -76,6 +77,7 @@ public class NotificationMgr
 
     public void setGroupNotification(ArrayList<NotificationNote> notes)
     {
+        clearAllNotifications();
         ArrayList<NotificationNote> visibleNotes = getVisibleNotes(notes);
         if (Globals.LOG) Log.d(Globals.TAG, "Group notification: visible notes " + visibleNotes.size());
 
