@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
@@ -26,23 +27,14 @@ public class NotificationMgr
     private static  final  int SUMMARY_NOTIF_ID = -2000;
     private static final String GROUP_KEY = "com.khuttun.notificationnotes";
     private Context context;
-    private NotificationManager notificationManager;
+    private NotificationManagerCompat notificationManager;
     // private NotificationCompat.Builder notificationBuilder;
     private boolean groupAPI = false;
 
     public NotificationMgr(Context context)
     {
         this.context = context;
-        this.notificationManager = (NotificationManager) this.context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        // NotificationChannel is required on Oreo and newer
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-        {
-            this.notificationManager.createNotificationChannel(new NotificationChannel(
-                    CHANNEL_ID,
-                    this.context.getString(R.string.channel_name),
-                    NotificationManager.IMPORTANCE_LOW));
-        }
+        this.notificationManager = NotificationManagerCompat.from(this.context);
 
         // Grouping notifications together so they are expandable is available on Nougat and newer
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
@@ -104,8 +96,17 @@ public class NotificationMgr
                         Notification note = groupedNotes.get(i);
                         String title = note.extras.getString("android.title");
                         String text = note.extras.getString("android.text");
-                        int id = i == groupedNotes.size()-1 ?
-                                SUMMARY_NOTIF_ID : findNotification(notes, title, text);
+                        int id = -1;
+                        if (i == groupedNotes.size()-1)
+                        {
+                           id = SUMMARY_NOTIF_ID;
+                        } else if (i == 0)
+                        {
+                            id = GROUP_NOTIF_ID;
+                        } else
+                        {
+                            id = findNotification(notes, title, text);
+                        }
                         this.notificationManager.notify("note", id, note);
                     }
                 }
@@ -174,6 +175,8 @@ public class NotificationMgr
         notificationBuilder.setContentTitle(
                 this.context.getString(R.string.group_notif_title) + ": " + notes.size());
         notificationBuilder.setContentText(getGroupNotificationLine(notes.get(0)));
+        notificationBuilder.setGroup(GROUP_KEY);
+        notificationBuilder.setGroupSummary(true);
         return notificationBuilder.build();
     }
 
@@ -187,15 +190,17 @@ public class NotificationMgr
 
     // Used for Android Nougat (7.0) and above
     private ArrayList<Notification> createGroupNotifications(ArrayList<NotificationNote> notes) {
-
         ArrayList<Notification> groupedNotes = new ArrayList<Notification>();
+        Notification compatSummary = createLegacyGroupNotification(notes);
+        groupedNotes.add(compatSummary);
         for (int i = 0; i < notes.size(); ++i)
         {
             NotificationNote note = notes.get(i);
             Notification newNote = createGroupNotification(note.title, note.text);
             groupedNotes.add(newNote);
         }
-        Notification summary = createSummaryNotification(notes.size());
+        String message = this.context.getString(R.string.group_notif_title) + ": " + notes.size();
+        Notification summary = createGroupNotification(message, "");
         groupedNotes.add(summary);
         return groupedNotes;
     }
@@ -215,11 +220,11 @@ public class NotificationMgr
     {
         String message = this.context.getString(R.string.group_notif_title) + ": " + size;
         NotificationCompat.Builder notificationBuilder = getNotificationBuilder();
-        notificationBuilder.setStyle(new NotificationCompat.InboxStyle());
+        notificationBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(message));
         notificationBuilder.setContentTitle(message);
         notificationBuilder.setContentText(message);
         notificationBuilder.setGroup(this.GROUP_KEY);
-        notificationBuilder.setGroupSummary(true);
+        notificationBuilder.setGroupSummary(false);
         return notificationBuilder.build();
     }
 }
