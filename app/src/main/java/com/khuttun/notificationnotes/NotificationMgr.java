@@ -88,32 +88,24 @@ public class NotificationMgr
                 break;
 
             default:
-                if (groupAPI)
+                ArrayList<Notification> groupedNotes = createGroupNotifications(visibleNotes);
+                for (int i = 0; i < groupedNotes.size(); i++)
                 {
-                    ArrayList<Notification> groupedNotes = createGroupNotifications(visibleNotes);
-                    for (int i = 0; i < groupedNotes.size(); i++)
+                    Notification note = groupedNotes.get(i);
+                    String title = note.extras.getString("android.title");
+                    String text = note.extras.getString("android.text");
+                    int id = -1;
+                    if (i == groupedNotes.size()-1)
                     {
-                        Notification note = groupedNotes.get(i);
-                        String title = note.extras.getString("android.title");
-                        String text = note.extras.getString("android.text");
-                        int id = -1;
-                        if (i == groupedNotes.size()-1)
-                        {
-                           id = SUMMARY_NOTIF_ID;
-                        } else if (i == 0)
-                        {
-                            id = GROUP_NOTIF_ID;
-                        } else
-                        {
-                            id = findNotification(notes, title, text);
-                        }
-                        this.notificationManager.notify("note", id, note);
+                       id = SUMMARY_NOTIF_ID;
+                    } else if (i == 0)
+                    {
+                        id = GROUP_NOTIF_ID;
+                    } else
+                    {
+                        id = findNotification(notes, title, text);
                     }
-                }
-                else
-                {
-                    this.notificationManager.notify(GROUP_NOTIF_ID,
-                            createLegacyGroupNotification(visibleNotes));
+                    this.notificationManager.notify("note", id, note);
                 }
                 break;
         }
@@ -191,17 +183,20 @@ public class NotificationMgr
     // Used for Android Nougat (7.0) and above
     private ArrayList<Notification> createGroupNotifications(ArrayList<NotificationNote> notes) {
         ArrayList<Notification> groupedNotes = new ArrayList<Notification>();
-        Notification compatSummary = createLegacyGroupNotification(notes);
-        groupedNotes.add(compatSummary);
+        Notification summary = createLegacyGroupNotification(notes);
+        groupedNotes.add(summary);
         for (int i = 0; i < notes.size(); ++i)
         {
             NotificationNote note = notes.get(i);
             Notification newNote = createGroupNotification(note.title, note.text);
             groupedNotes.add(newNote);
         }
-        String message = this.context.getString(R.string.group_notif_title) + ": " + notes.size();
-        Notification summary = createGroupNotification(message, "");
-        groupedNotes.add(summary);
+
+        if (groupAPI)
+        {
+            Notification top = createTopNotification(notes.size());
+            groupedNotes.add(top);
+        }
         return groupedNotes;
     }
 
@@ -216,13 +211,11 @@ public class NotificationMgr
         return notificationBuilder.build();
     }
 
-    private Notification createSummaryNotification(int size)
+    private Notification createTopNotification(int size)
     {
         String message = this.context.getString(R.string.group_notif_title) + ": " + size;
         NotificationCompat.Builder notificationBuilder = getNotificationBuilder();
-        notificationBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(message));
         notificationBuilder.setContentTitle(message);
-        notificationBuilder.setContentText(message);
         notificationBuilder.setGroup(this.GROUP_KEY);
         notificationBuilder.setGroupSummary(false);
         return notificationBuilder.build();
