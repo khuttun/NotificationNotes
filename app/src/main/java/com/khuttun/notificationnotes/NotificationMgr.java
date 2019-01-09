@@ -1,8 +1,6 @@
 package com.khuttun.notificationnotes;
 
 import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -24,11 +22,10 @@ public class NotificationMgr
 {
     private static final String CHANNEL_ID = "notes";
     private static final int GROUP_NOTIF_ID = -1000;
-    private static  final  int SUMMARY_NOTIF_ID = -2000;
+    private static final int SUMMARY_NOTIF_ID = -2000;
     private static final String GROUP_KEY = "com.khuttun.notificationnotes";
     private Context context;
     private NotificationManagerCompat notificationManager;
-    // private NotificationCompat.Builder notificationBuilder;
     private boolean groupAPI = false;
 
     public NotificationMgr(Context context)
@@ -57,6 +54,7 @@ public class NotificationMgr
     public void setNotification(NotificationNote note)
     {
         if (Globals.LOG) Log.d(Globals.TAG, "Notification: ID " + note.id + ", show " + note.isVisible);
+
         if (note.isVisible)
         {
             this.notificationManager.notify(note.id, createNotification(note.title, note.text));
@@ -76,7 +74,6 @@ public class NotificationMgr
 
         switch (visibleNotes.size())
         {
-
             case 0:
                 this.notificationManager.cancel(GROUP_NOTIF_ID);
                 break;
@@ -95,15 +92,17 @@ public class NotificationMgr
                     String title = note.extras.getString("android.title");
                     String text = note.extras.getString("android.text");
                     int id = -1;
-                    if (i == groupedNotes.size()-1)
+                    if (i == groupedNotes.size() - 1)
                     {
-                       id = SUMMARY_NOTIF_ID;
-                    } else if (i == 0)
+                        id = SUMMARY_NOTIF_ID;
+                    }
+                    else if (i == 0)
                     {
                         id = GROUP_NOTIF_ID;
-                    } else
+                    }
+                    else
                     {
-                        id = findNotification(notes, title, text);
+                        id = findNotificationID(notes, title, text);
                     }
                     this.notificationManager.notify("note", id, note);
                 }
@@ -111,7 +110,7 @@ public class NotificationMgr
         }
     }
 
-    private int findNotification(ArrayList<NotificationNote> notes, String title, String text)
+    private int findNotificationID(ArrayList<NotificationNote> notes, String title, String text)
     {
         for (int j = 0; j < notes.size(); j++)
         {
@@ -124,7 +123,8 @@ public class NotificationMgr
         return -1;
     }
 
-    private ArrayList<NotificationNote> getVisibleNotes(ArrayList<NotificationNote> notes) {
+    private ArrayList<NotificationNote> getVisibleNotes(ArrayList<NotificationNote> notes)
+    {
         ArrayList<NotificationNote> visibleNotes = new ArrayList<>();
         for (int i = 0; i < notes.size(); i++)
         {
@@ -154,8 +154,12 @@ public class NotificationMgr
     }
 
 
-    // Used for Android versions below Nougat (7.0)
-    private Notification createLegacyGroupNotification(ArrayList<NotificationNote> notes)
+    /**
+     * Creates a notification with the number of notes and the first line of each note.
+     * Used for Android versions below Nougat (7.0).
+     * Is required for Android versions Nougat and beyond, but does not show.
+     */
+    private Notification createSummaryNotification(ArrayList<NotificationNote> notes)
     {
         NotificationCompat.Builder notificationBuilder = getNotificationBuilder();
         NotificationCompat.InboxStyle style = new NotificationCompat.InboxStyle();
@@ -180,10 +184,10 @@ public class NotificationMgr
         return sp;
     }
 
-    // Used for Android Nougat (7.0) and above
-    private ArrayList<Notification> createGroupNotifications(ArrayList<NotificationNote> notes) {
+    private ArrayList<Notification> createGroupNotifications(ArrayList<NotificationNote> notes)
+    {
         ArrayList<Notification> groupedNotes = new ArrayList<Notification>();
-        Notification summary = createLegacyGroupNotification(notes);
+        Notification summary = createSummaryNotification(notes);
         groupedNotes.add(summary);
         for (int i = 0; i < notes.size(); ++i)
         {
@@ -200,6 +204,9 @@ public class NotificationMgr
         return groupedNotes;
     }
 
+    /**
+     * Creates a notification that is the member of a group & is not the summary.
+     */
     private Notification createGroupNotification(String title, String text)
     {
         NotificationCompat.Builder notificationBuilder = getNotificationBuilder();
@@ -211,6 +218,9 @@ public class NotificationMgr
         return notificationBuilder.build();
     }
 
+    /**
+     * Creates a notification that shows how many notes there are.
+     */
     private Notification createTopNotification(int size)
     {
         String message = this.context.getString(R.string.group_notif_title) + ": " + size;
