@@ -85,26 +85,34 @@ public class NotificationMgr
                 break;
 
             default:
-                ArrayList<Notification> groupedNotes = createGroupNotifications(visibleNotes);
-                for (int i = 0; i < groupedNotes.size(); i++)
+                if (groupAPI)
                 {
-                    Notification note = groupedNotes.get(i);
-                    String title = note.extras.getString("android.title");
-                    String text = note.extras.getString("android.text");
-                    int id = -1;
-                    if (i == groupedNotes.size() - 1)
+                    ArrayList<Notification> groupedNotes = createGroupNotifications(visibleNotes);
+                    for (int i = 0; i < groupedNotes.size(); i++)
                     {
-                        id = SUMMARY_NOTIF_ID;
+                        Notification note = groupedNotes.get(i);
+                        String title = note.extras.getString("android.title");
+                        String text = note.extras.getString("android.text");
+                        int id = -1;
+                        if (i == groupedNotes.size() - 1)
+                        {
+                            id = SUMMARY_NOTIF_ID;
+                        }
+                        else if (i == 0)
+                        {
+                            id = GROUP_NOTIF_ID;
+                        }
+                        else
+                        {
+                            id = findNotificationID(notes, title, text);
+                        }
+                        this.notificationManager.notify("note", id, note);
                     }
-                    else if (i == 0)
-                    {
-                        id = GROUP_NOTIF_ID;
-                    }
-                    else
-                    {
-                        id = findNotificationID(notes, title, text);
-                    }
-                    this.notificationManager.notify("note", id, note);
+                }
+                else
+                {
+                    this.notificationManager.notify("note", SUMMARY_NOTIF_ID,
+                            createSummaryNotification(visibleNotes));
                 }
                 break;
         }
@@ -156,7 +164,7 @@ public class NotificationMgr
 
     /**
      * Creates a notification with the number of notes and the first line of each note.
-     * Used for Android versions below Nougat (7.0).
+     * Visible for Android versions below Nougat (7.0).
      * Is required for Android versions Nougat and beyond, but does not show.
      */
     private Notification createSummaryNotification(ArrayList<NotificationNote> notes)
