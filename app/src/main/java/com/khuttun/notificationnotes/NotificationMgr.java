@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.text.Spannable;
@@ -87,51 +88,18 @@ public class NotificationMgr
             default:
                 if (groupAPI)
                 {
-                    ArrayList<Notification> groupedNotes = createGroupNotifications(visibleNotes);
-                    for (int i = 0; i < groupedNotes.size(); i++)
-                    {
-                        Notification note = groupedNotes.get(i);
-                        String title = note.extras.getString("android.title");
-                        String text = note.extras.getString("android.text");
-                        int id = -1;
-                        if (i == groupedNotes.size() - 1)
-                        {
-                            id = SUMMARY_NOTIF_ID;
-                        }
-                        else if (i == 0)
-                        {
-                            id = GROUP_NOTIF_ID;
-                        }
-                        else
-                        {
-                            id = findNotificationID(notes, title, text);
-                        }
-                        this.notificationManager.notify("note", id, note);
-                    }
+                    displayGroupNotifications(visibleNotes);
                 }
                 else
                 {
-                    this.notificationManager.notify("note", SUMMARY_NOTIF_ID,
+                    this.notificationManager.notify(SUMMARY_NOTIF_ID,
                             createSummaryNotification(visibleNotes));
                 }
                 break;
         }
     }
 
-    private int findNotificationID(ArrayList<NotificationNote> notes, String title, String text)
-    {
-        for (int j = 0; j < notes.size(); j++)
-        {
-            NotificationNote note = notes.get(j);
-            if (note.text == text && note.title == title)
-            {
-                return note.id;
-            }
-        }
-        return -1;
-    }
-
-    private ArrayList<NotificationNote> getVisibleNotes(ArrayList<NotificationNote> notes)
+    private static ArrayList<NotificationNote> getVisibleNotes(ArrayList<NotificationNote> notes)
     {
         ArrayList<NotificationNote> visibleNotes = new ArrayList<>();
         for (int i = 0; i < notes.size(); i++)
@@ -151,7 +119,6 @@ public class NotificationMgr
         this.notificationManager.cancelAll();
     }
 
-
     private Notification createNotification(String title, String text)
     {
         NotificationCompat.Builder notificationBuilder = getNotificationBuilder();
@@ -160,7 +127,6 @@ public class NotificationMgr
         notificationBuilder.setContentText(text);
         return notificationBuilder.build();
     }
-
 
     /**
      * Creates a notification with the number of notes and the first line of each note.
@@ -181,9 +147,15 @@ public class NotificationMgr
         notificationBuilder.setContentText(getGroupNotificationLine(notes.get(0)));
         notificationBuilder.setGroup(GROUP_KEY);
         notificationBuilder.setGroupSummary(true);
+        // For Android Nougat and above (7.0), create a Bundle containing thek
+        if (groupAPI)
+        {
+            Bundle extraNotificationInfo = new Bundle(1);
+            extraNotificationInfo.putInt("note.id", SUMMARY_NOTIF_ID);
+            notificationBuilder.addExtras(extraNotificationInfo);
+        }
         return notificationBuilder.build();
     }
-
 
     private CharSequence getGroupNotificationLine(NotificationNote note)
     {
@@ -192,6 +164,25 @@ public class NotificationMgr
         return sp;
     }
 
+    private void displayGroupNotifications(ArrayList<NotificationNote> visibleNotes)
+    {
+        ArrayList<Notification> groupedNotes = createGroupNotifications(visibleNotes);
+        for (int i = 0; i < groupedNotes.size(); i++)
+        {
+            Notification note = groupedNotes.get(i);
+            int id = note.extras.getInt("note.id");
+            if (Globals.LOG)
+            {
+                Log.d(Globals.TAG, "Displaying notification for note with id ".concat(Integer.toString(id)));
+            }
+            this.notificationManager.notify(id, note);
+        }
+    }
+
+    /**
+     * Creates the group of notifications that will be bundled together into one notification.
+     * Used for Android Nougat (7.0) and beyond.
+     */
     private ArrayList<Notification> createGroupNotifications(ArrayList<NotificationNote> notes)
     {
         ArrayList<Notification> groupedNotes = new ArrayList<Notification>();
@@ -199,30 +190,29 @@ public class NotificationMgr
         groupedNotes.add(summary);
         for (int i = 0; i < notes.size(); ++i)
         {
-            NotificationNote note = notes.get(i);
-            Notification newNote = createGroupNotification(note.title, note.text);
+            Notification newNote = createGroupNotification(notes.get(i));
             groupedNotes.add(newNote);
         }
 
-        if (groupAPI)
-        {
-            Notification top = createTopNotification(notes.size());
-            groupedNotes.add(top);
-        }
+        Notification top = createTopNotification(notes.size());
+        groupedNotes.add(top);
         return groupedNotes;
     }
 
     /**
      * Creates a notification that is the member of a group & is not the summary.
      */
-    private Notification createGroupNotification(String title, String text)
+    private Notification createGroupNotification(NotificationNote note)
     {
         NotificationCompat.Builder notificationBuilder = getNotificationBuilder();
-        notificationBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(text));
-        notificationBuilder.setContentTitle(title);
-        notificationBuilder.setContentText(text);
+        notificationBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(note.text));
+        notificationBuilder.setContentTitle(note.title);
+        notificationBuilder.setContentText(note.text);
         notificationBuilder.setGroup(this.GROUP_KEY);
         notificationBuilder.setGroupSummary(false);
+        Bundle extraNotificationInfo = new Bundle(1);
+        extraNotificationInfo.putInt("note.id", note.id);
+        notificationBuilder.addExtras(extraNotificationInfo);
         return notificationBuilder.build();
     }
 
@@ -236,6 +226,9 @@ public class NotificationMgr
         notificationBuilder.setContentTitle(message);
         notificationBuilder.setGroup(this.GROUP_KEY);
         notificationBuilder.setGroupSummary(false);
+        Bundle extraNotificationInfo = new Bundle(1);
+        extraNotificationInfo.putInt("note.id", GROUP_NOTIF_ID);
+        notificationBuilder.addExtras(extraNotificationInfo);
         return notificationBuilder.build();
     }
 }
