@@ -1,6 +1,8 @@
 package com.khuttun.notificationnotes;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -26,30 +28,39 @@ public class NotificationMgr
     private static final int SUMMARY_NOTIF_ID = -2000;
     private static final String GROUP_KEY = "com.khuttun.notificationnotes";
     private Context context;
-    private NotificationManagerCompat notificationManager;
+    private NotificationManager notificationManager;
     private boolean groupAPI = false;
+    private NotificationCompat.Builder notificationBuilder;
 
     public NotificationMgr(Context context)
     {
         this.context = context;
-        this.notificationManager = NotificationManagerCompat.from(this.context);
+        // Need the NotificationManager type for a NotificationChannel,
+        // the official documentation saying to use NotificationManager.Compat is
+        // wrong
+        this.notificationManager = (NotificationManager) this.context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // A NotificationChannel is needed for Android Oreo and above
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        {
+            this.notificationManager.createNotificationChannel(new NotificationChannel(
+                    CHANNEL_ID,
+                    this.context.getString(R.string.channel_name),
+                    NotificationManager.IMPORTANCE_LOW));
+        }
 
         // Grouping notifications together so they are expandable is available on Nougat and newer
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
         {
             this.groupAPI = true;
         }
-    }
 
-    public NotificationCompat.Builder getNotificationBuilder()
-    {
-        NotificationCompat.Builder Builder = new NotificationCompat.Builder(this.context, CHANNEL_ID);
-        Builder.setSmallIcon(R.drawable.pen);
-        Builder.setOngoing(true);
-        Builder.setPriority(NotificationCompat.PRIORITY_LOW);
-        Builder.setContentIntent(PendingIntent
+        notificationBuilder = new NotificationCompat.Builder(this.context, CHANNEL_ID);
+        notificationBuilder.setSmallIcon(R.drawable.pen);
+        notificationBuilder.setOngoing(true);
+        notificationBuilder.setPriority(NotificationCompat.PRIORITY_LOW);
+        notificationBuilder.setContentIntent(PendingIntent
                 .getActivity(this.context, 0, new Intent(this.context, MainActivity.class), 0));
-        return Builder;
     }
 
     public void setNotification(NotificationNote note)
@@ -68,7 +79,6 @@ public class NotificationMgr
 
     public void setGroupNotification(ArrayList<NotificationNote> notes)
     {
-        clearAllNotifications();
         ArrayList<NotificationNote> visibleNotes = getVisibleNotes(notes);
         if (Globals.LOG) Log.d(Globals.TAG, "Group notification: visible notes " + visibleNotes.size());
 
@@ -121,11 +131,10 @@ public class NotificationMgr
 
     private Notification createNotification(String title, String text)
     {
-        NotificationCompat.Builder notificationBuilder = getNotificationBuilder();
-        notificationBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(text));
-        notificationBuilder.setContentTitle(title);
-        notificationBuilder.setContentText(text);
-        return notificationBuilder.build();
+        this.notificationBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(text));
+        this.notificationBuilder.setContentTitle(title);
+        this.notificationBuilder.setContentText(text);
+        return this.notificationBuilder.build();
     }
 
     /**
@@ -135,26 +144,25 @@ public class NotificationMgr
      */
     private Notification createSummaryNotification(ArrayList<NotificationNote> notes)
     {
-        NotificationCompat.Builder notificationBuilder = getNotificationBuilder();
         NotificationCompat.InboxStyle style = new NotificationCompat.InboxStyle();
         for (int i = 0; i < notes.size(); ++i)
         {
             style.addLine(getGroupNotificationLine(notes.get(i)));
         }
-        notificationBuilder.setStyle(style);
-        notificationBuilder.setContentTitle(
+        this.notificationBuilder.setStyle(style);
+        this.notificationBuilder.setContentTitle(
                 this.context.getString(R.string.group_notif_title) + ": " + notes.size());
-        notificationBuilder.setContentText(getGroupNotificationLine(notes.get(0)));
-        notificationBuilder.setGroup(GROUP_KEY);
-        notificationBuilder.setGroupSummary(true);
+        this.notificationBuilder.setContentText(getGroupNotificationLine(notes.get(0)));
+        this.notificationBuilder.setGroup(GROUP_KEY);
+        this.notificationBuilder.setGroupSummary(true);
         // For Android Nougat and above (7.0), create a Bundle containing thek
         if (groupAPI)
         {
             Bundle extraNotificationInfo = new Bundle(1);
             extraNotificationInfo.putInt("note.id", SUMMARY_NOTIF_ID);
-            notificationBuilder.addExtras(extraNotificationInfo);
+            this.notificationBuilder.addExtras(extraNotificationInfo);
         }
-        return notificationBuilder.build();
+        return this.notificationBuilder.build();
     }
 
     private CharSequence getGroupNotificationLine(NotificationNote note)
@@ -166,6 +174,7 @@ public class NotificationMgr
 
     private void displayGroupNotifications(ArrayList<NotificationNote> visibleNotes)
     {
+        clearAllNotifications();
         ArrayList<Notification> groupedNotes = createGroupNotifications(visibleNotes);
         for (int i = 0; i < groupedNotes.size(); i++)
         {
@@ -204,16 +213,15 @@ public class NotificationMgr
      */
     private Notification createGroupNotification(NotificationNote note)
     {
-        NotificationCompat.Builder notificationBuilder = getNotificationBuilder();
-        notificationBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(note.text));
-        notificationBuilder.setContentTitle(note.title);
-        notificationBuilder.setContentText(note.text);
-        notificationBuilder.setGroup(this.GROUP_KEY);
-        notificationBuilder.setGroupSummary(false);
+        this.notificationBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(note.text));
+        this.notificationBuilder.setContentTitle(note.title);
+        this.notificationBuilder.setContentText(note.text);
+        this.notificationBuilder.setGroup(this.GROUP_KEY);
+        this.notificationBuilder.setGroupSummary(false);
         Bundle extraNotificationInfo = new Bundle(1);
         extraNotificationInfo.putInt("note.id", note.id);
-        notificationBuilder.addExtras(extraNotificationInfo);
-        return notificationBuilder.build();
+        this.notificationBuilder.addExtras(extraNotificationInfo);
+        return this.notificationBuilder.build();
     }
 
     /**
@@ -222,14 +230,15 @@ public class NotificationMgr
     private Notification createTopNotification(int size)
     {
         String message = this.context.getString(R.string.group_notif_title) + ": " + size;
-        NotificationCompat.Builder notificationBuilder = getNotificationBuilder();
-        notificationBuilder.setContentTitle(message);
-        notificationBuilder.setGroup(this.GROUP_KEY);
-        notificationBuilder.setGroupSummary(false);
+        this.notificationBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(null));
+        this.notificationBuilder.setContentTitle(message);
+        this.notificationBuilder.setContentText(null);
+        this.notificationBuilder.setGroup(this.GROUP_KEY);
+        this.notificationBuilder.setGroupSummary(false);
         Bundle extraNotificationInfo = new Bundle(1);
         extraNotificationInfo.putInt("note.id", GROUP_NOTIF_ID);
-        notificationBuilder.addExtras(extraNotificationInfo);
-        return notificationBuilder.build();
+        this.notificationBuilder.setExtras(extraNotificationInfo);
+        return this.notificationBuilder.build();
     }
 }
 
