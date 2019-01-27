@@ -202,6 +202,7 @@ class NotesListAdapter
         if (PreferenceManager.getDefaultSharedPreferences(this.context).getBoolean(this.context
                 .getString(R.string.group_notif_pref_key), false))
         {
+            this.notificationMgr.checkNotification(n);
             this.notificationMgr.setGroupNotification(this.notes);
         }
         else
